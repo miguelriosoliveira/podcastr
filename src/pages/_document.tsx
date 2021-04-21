@@ -11,6 +11,7 @@ export default class MyDocument extends Document {
 						rel="stylesheet"
 					/>
 					<link rel="shortcut icon" href="/favicon.png" type="image/png" />
+					<title>Podcastr</title>
 				</Head>
 				<body>
 					<Main />

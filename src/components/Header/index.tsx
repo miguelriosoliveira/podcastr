@@ -1,15 +1,17 @@
-/* eslint-disable import/no-duplicates */
-import format from 'date-fns/format';
-import ptBR from 'date-fns/locale/pt-BR';
+import Link from 'next/link';
+
+import { formatDate } from '../../utils/formatter';
 
 import styles from './styles.module.scss';
 
 export function Header() {
-	const currentDate = format(new Date(), 'EEEEEE, d MMMM', { locale: ptBR });
+	const currentDate = formatDate(new Date(), 'EEEEEE, d MMMM');
 
 	return (
 		<header className={styles.headerContainer}>
-			<img src="/images/logo.svg" alt="Podcastr" />
+			<Link href="/">
+				<img src="/images/logo.svg" alt="Podcastr" />
+			</Link>
 			<p>O melhor para você ouvir, sempre</p>
 			<span>{currentDate}</span>
 		</header>

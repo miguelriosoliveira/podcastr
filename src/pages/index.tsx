@@ -2,6 +2,7 @@ import { GetStaticProps } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { usePlayer } from '../hooks/usePlayer';
 import { api } from '../services/api';
 import { convertDurationToTimeString, formatDate } from '../utils/formatter';
 
@@ -15,12 +16,15 @@ interface Episode {
 	thumbnail: string;
 	file: {
 		duration: number;
+		url: string;
 	};
 }
 
 interface EpisodeFormatted extends Episode {
 	publishedAt: string;
 	durationFormatted: string;
+	duration: number;
+	url: string;
 }
 
 interface HomeProps {
@@ -29,6 +33,12 @@ interface HomeProps {
 }
 
 export default function HomePage({ latestEpisodes, olderEpisodes }: HomeProps) {
+	const { play } = usePlayer();
+
+	function handlePlay(episode: EpisodeFormatted) {
+		return () => play(episode);
+	}
+
 	return (
 		<div className={styles.homepage}>
 			<section className={styles.latestEpisodes}>
@@ -51,7 +61,7 @@ export default function HomePage({ latestEpisodes, olderEpisodes }: HomeProps) {
 								<span>{episode.durationFormatted}</span>
 							</div>
 
-							<button type="button">
+							<button type="button" onClick={handlePlay(episode)}>
 								<img src="/images/play-green.svg" alt="Tocar episódio" />
 							</button>
 						</li>
@@ -91,7 +101,7 @@ export default function HomePage({ latestEpisodes, olderEpisodes }: HomeProps) {
 								<td className={styles.publishedAt}>{episode.publishedAt}</td>
 								<td>{episode.durationFormatted}</td>
 								<td>
-									<button type="button">
+									<button type="button" onClick={handlePlay(episode)}>
 										<img src="/images/play-green.svg" alt="Tocar episódio" />
 									</button>
 								</td>
@@ -117,6 +127,8 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
 		...episode,
 		publishedAt: formatDate(episode.published_at, 'd MMM yy'),
 		durationFormatted: convertDurationToTimeString(episode.file.duration),
+		duration: episode.file.duration,
+		url: episode.file.url,
 	}));
 
 	const latestEpisodes = episodes.slice(0, 2);

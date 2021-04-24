@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 
+import { usePlayer } from '../../hooks/usePlayer';
 import { api } from '../../services/api';
 import { convertDurationToTimeString, formatDate } from '../../utils/formatter';
 
@@ -17,12 +18,15 @@ interface Episode {
 	description: string;
 	file: {
 		duration: number;
+		url: string;
 	};
 }
 
 interface EpisodeFormatted extends Episode {
 	publishedAt: string;
 	durationFormatted: string;
+	duration: number;
+	url: string;
 }
 
 interface EpisodeProps {
@@ -31,6 +35,11 @@ interface EpisodeProps {
 
 export default function EpisodePage({ episode }: EpisodeProps) {
 	const router = useRouter();
+	const { play } = usePlayer();
+
+	function handlePlay(selectedEpisode: EpisodeFormatted) {
+		return () => play(selectedEpisode);
+	}
 
 	return (
 		<>
@@ -51,7 +60,7 @@ export default function EpisodePage({ episode }: EpisodeProps) {
 							height={160}
 							objectFit="cover"
 						/>
-						<button type="button">
+						<button type="button" onClick={handlePlay(episode)}>
 							<img src="/images/play.svg" alt="Play" />
 						</button>
 					</div>
@@ -98,6 +107,8 @@ export const getStaticProps: GetStaticProps<EpisodeProps> = async ({ params: { s
 		...episode,
 		publishedAt: formatDate(episode.published_at, 'd MMM yy'),
 		durationFormatted: convertDurationToTimeString(episode.file.duration),
+		duration: episode.file.duration,
+		url: episode.file.url,
 	};
 
 	return {
